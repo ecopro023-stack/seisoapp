@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>機械定期清掃 準備チェックシート｜えこぷろ</title>
+<style>
+  :root{
+    --ink:#1b1f24;--paper:#ffffff;--line:#e4e6ea;--muted:#6b7280;
+    --accent:#0d6efd;--accent-dark:#0a58ca;
+    --hose:#0f766e;--hosebg:#e6f5f3;
+    --warn-bg:#fff4d6;--warn-line:#e6a700;--warn-ink:#7a5a00;
+    --done:#12a150;--done-bg:#e8f7ee;--band:#111827;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;}
+  body{font-family:-apple-system,"Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif;
+    background:#f3f4f6;color:var(--ink);line-height:1.55;padding-bottom:90px;}
+  header{background:var(--band);color:#fff;padding:16px 18px 14px;position:sticky;top:0;z-index:50;}
+  header .kicker{font-size:12px;letter-spacing:.14em;color:#9aa4b2;font-weight:700;}
+  header h1{font-size:19px;margin:2px 0 0;font-weight:800;letter-spacing:.01em;}
+  header .co{font-size:12px;color:#9aa4b2;margin-top:3px;}
+  .progresswrap{margin-top:12px;}
+  .progressbar{height:8px;background:#374151;border-radius:99px;overflow:hidden;}
+  .progressfill{height:100%;width:0;background:var(--done);transition:width .25s ease;}
+  .progresstxt{font-size:12px;color:#cbd2dc;margin-top:6px;font-weight:600;}
+  .wrap{max-width:640px;margin:0 auto;padding:14px 12px 0;}
+  .tabs{display:flex;gap:8px;margin:2px 0 16px;}
+  .tab{flex:1;padding:13px 6px;border:2px solid var(--line);background:#fff;border-radius:12px;
+    font-weight:800;font-size:14px;text-align:center;color:var(--muted);cursor:pointer;line-height:1.3;}
+  .tab small{display:block;font-size:11px;font-weight:600;margin-top:2px;}
+  .tab.active{border-color:var(--accent);color:var(--accent-dark);background:#eef4ff;}
+  .tab.hose.active{border-color:var(--hose);color:var(--hose);background:var(--hosebg);}
+  .phase{font-size:13px;font-weight:800;letter-spacing:.08em;color:#fff;
+    background:var(--accent);display:inline-block;padding:5px 12px;border-radius:8px;margin:6px 0 10px;}
+  .phase.hose{background:var(--hose);}
+  .phase.pack{background:#5a6472;margin-top:20px;}
+  .card{background:var(--paper);border:1px solid var(--line);border-radius:14px;
+    margin:0 0 10px;overflow:hidden;transition:border-color .15s;}
+  .card.done{border-color:var(--done);background:var(--done-bg);}
+  .row{display:flex;align-items:flex-start;gap:13px;padding:14px 14px;cursor:pointer;}
+  .num{flex:0 0 30px;height:30px;border-radius:8px;background:#eef1f5;color:#111827;
+    font-weight:800;font-size:15px;display:flex;align-items:center;justify-content:center;margin-top:1px;}
+  .card.done .num{background:var(--done);color:#fff;}
+  .card.hk .num{background:var(--hosebg);color:var(--hose);}
+  .card.hk.done .num{background:var(--done);color:#fff;}
+  .box{flex:0 0 26px;height:26px;border:2.5px solid #c4c9d2;border-radius:7px;margin-top:3px;
+    display:flex;align-items:center;justify-content:center;background:#fff;transition:.12s;}
+  .card.done .box{background:var(--done);border-color:var(--done);}
+  .box svg{width:16px;height:16px;opacity:0;}
+  .card.done .box svg{opacity:1;}
+  .txt{flex:1;}
+  .txt .t{font-weight:700;font-size:16px;}
+  .txt .d{font-size:13.5px;color:var(--muted);margin-top:3px;}
+  .card.done .txt .t{text-decoration:line-through;color:#8a93a0;}
+  .warn{background:var(--warn-bg);border:1px solid var(--warn-line);border-radius:12px;
+    padding:11px 13px;margin:0 0 10px;display:flex;gap:10px;align-items:flex-start;}
+  .warn .ic{flex:0 0 auto;font-size:17px;line-height:1.4;}
+  .warn .wt{font-size:13.5px;color:var(--warn-ink);font-weight:600;}
+  .warn .wt b{color:#8a4b00;}
+  .footbar{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);
+    padding:10px 12px;display:flex;gap:10px;max-width:640px;margin:0 auto;
+    box-shadow:0 -4px 14px rgba(0,0,0,.06);z-index:60;}
+  .btn{flex:1;padding:13px;border-radius:11px;font-weight:800;font-size:15px;border:none;cursor:pointer;}
+  .btn.reset{background:#f1f3f5;color:#495057;}
+  .btn.done{background:var(--done);color:#fff;}
+  .hint{max-width:640px;margin:8px auto 24px;padding:0 14px;font-size:12px;color:#9aa4b2;text-align:center;}
+</style>
+</head>
+<body>
+<header>
+  <div class="kicker">機械定期清掃 ／ 共用部</div>
+  <h1>洗浄チェックシート</h1>
+  <div class="co">株式会社えこぷろ</div>
+  <div class="progresswrap">
+    <div class="progressbar"><div class="progressfill" id="fill"></div></div>
+    <div class="progresstxt" id="ptxt">0 / 0 完了</div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="tabs">
+    <div class="tab active" data-mode="kikai" onclick="setMode('kikai')">
+      高圧洗浄機で洗う<small>本体・ガン使用</small>
+    </div>
+    <div class="tab hose" data-mode="hose" onclick="setMode('hose')">
+      水道ホースで洗う<small>散水ノズル・本体なし</small>
+    </div>
+  </div>
+  <div id="list"></div>
+  <div class="hint">タップでチェック。次の現場では「リセット」で最初からやり直せます。</div>
+</div>
+
+<div class="footbar">
+  <button class="btn reset" onclick="resetAll()">リセット</button>
+  <button class="btn done" onclick="jump()">未完了へ移動</button>
+</div>
+
+<script>
+// ===== 高圧洗浄機モード =====
+const PREP = [
+  {t:"機材おろし・現場確認", d:"水源・電源の位置、コンセント容量(15A)、階段とエレベーターの動線を確認"},
+  {t:"最上階へ持ち込み", d:"水道ホース・高圧ホース・本体・ガンを持って、エレベーターで最上階へ上がる"},
+  {t:"ホースを繋いで階段を下りる", d:"高圧ホースとガンを持って階段から一番遠い所へ。ガンとホースを繋ぎ、伸ばしながら階段を下りる。※ガンを置いた位置は1mほどゆとりを持たせてから伸ばす。本体とホースの余りはエレベーターに乗せておき、足りなくなったらエレベーターを呼ぶ"},
+  {t:"本体を設置・高圧ホース接続", d:"高圧ホースの限界地点で本体を設置。絶対に邪魔にならない場所へ置き、高圧ホースを接続"},
+  {t:"ニップル取り付け＋漏れ養生", d:"蛇口にニップルを装着。蛇口やホースから水が漏れる場合はバスタオルでぐるぐる巻き、または細長いビニール養生。", warn:"leak"},
+  {t:"水道ホースを本体に接続", d:"高圧本体の給水口(IN)に水道ホースを接続"},
+  {t:"コンセント確認", d:"アース・漏電ブレーカー・容量を確認。濡れた手で触らない", warn:"elec"},
+  {t:"蛇口を開ける", d:"先に水を通す。機内に水が満たされてから電源へ"},
+  {t:"電源オン", d:"水が来ているのを確認してから電源ON。低圧で試運転して漏れをチェック（空運転はポンプ故障の原因）"},
+];
+const PACK = [
+  {t:"電源OFF・プラグを抜く", d:"必ず先に電源を落としてから作業"},
+  {t:"残圧・残水を抜く", d:"給水を止め、ガンのトリガーを握って高圧ホース内の圧と水を抜く"},
+  {t:"ホースを外して回収", d:"高圧ホース・水道ホースを外し、水を抜きながら巻き取って回収"},
+  {t:"本体の水抜き", d:"ポンプ内の水を抜く。特に冬季は凍結防止で必須", warn:"frost"},
+  {t:"コードリール巻き取り・積込み", d:"コード・ホース・機材をまとめて撤収"},
+];
+
+// ===== 水道ホースで洗うモード =====
+const HOSE = [
+  {t:"機材おろし・現場確認", d:"水源・電源の位置、コンセント容量(15A)、階段とエレベーターの動線を確認"},
+  {t:"最上階へ持ち込み", d:"水道ホース・散水ノズル・ニップルを持って最上階へ上がる"},
+  {t:"ノズル取り付け", d:"階段から一番遠いところへノズルを置きセットする。その際、1mほど余らせて階段でホースを伸ばしながら降りる"},
+  {t:"ニップル取り付け", d:"中間フロアまでホースを伸ばしたら散水栓を探してニップルを取り付ける。現場によってはゴミ庫のみにしか散水栓が無い場合もあるので、事前にファイルでチェックしておく"},
+  {t:"散水栓を開く", d:"高圧洗浄の時と同じ注意点（漏れ・PS扉内の浸水に注意）", warn:"leak"},
+];
+
+const WARN = {
+  leak:"<b>浸水注意</b>：PS（パイプスペース）扉内を絶対に浸水させない。漏れそうな時は先に養生する。",
+  elec:"<b>感電・火災注意</b>：濡れた手で触らない。コードリールは全部伸ばしてから通電（巻いたままは発熱）。",
+  frost:"<b>凍結・劣化注意</b>：水を残すと冬季に凍結し、ポンプが劣化・破損します。",
+};
+
+let mode='kikai';
+const state={};
+function key(p,i){return p+'_'+i;}
+
+function render(){
+  const list=document.getElementById('list');
+  let html='';
+  if(mode==='kikai'){
+    html+='<div class="phase">準備（到着 → 洗浄開始）</div>';
+    PREP.forEach((s,i)=>{ html+=card(key('p',i),i+1,s,false); });
+    html+='<div class="phase pack">片付け（終了 → 撤収）</div>';
+    PACK.forEach((s,i)=>{ html+=card(key('k',i),i+1,s,false); });
+  }else{
+    html+='<div class="phase hose">水道ホースで洗う</div>';
+    HOSE.forEach((s,i)=>{ html+=card(key('h',i),i+1,s,true); });
+  }
+  list.innerHTML=html;
+  updateProgress();
+}
+
+function card(k,n,s,isHose){
+  const done=state[k];
+  const warn=s.warn?`<div class="warn"><div class="ic">⚠️</div><div class="wt">${WARN[s.warn]}</div></div>`:'';
+  return `<div class="card ${isHose?'hk':''} ${done?'done':''}" data-k="${k}" onclick="toggle('${k}')">
+    <div class="row">
+      <div class="num">${n}</div>
+      <div class="box"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12l5 5L20 6" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="txt"><div class="t">${s.t}</div><div class="d">${s.d}</div></div>
+    </div>
+  </div>${warn}`;
+}
+
+function toggle(k){
+  state[k]=!state[k];
+  const el=document.querySelector(`.card[data-k="${k}"]`);
+  if(el) el.classList.toggle('done',state[k]);
+  updateProgress();
+}
+
+function setMode(m){
+  mode=m;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.mode===m));
+  render();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function updateProgress(){
+  let groups = mode==='kikai' ? [['p',PREP],['k',PACK]] : [['h',HOSE]];
+  let total=0,done=0;
+  groups.forEach(([p,arr])=>arr.forEach((s,i)=>{ total++; if(state[key(p,i)]) done++; }));
+  const pct=total?Math.round(done/total*100):0;
+  document.getElementById('fill').style.width=pct+'%';
+  document.getElementById('ptxt').textContent=`${done} / ${total} 完了`;
+}
+
+function resetAll(){
+  for(const k in state) state[k]=false;
+  render();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function jump(){
+  const c=[...document.querySelectorAll('.card:not(.done)')];
+  if(c.length) c[0].scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+render();
+</script>
+</body>
+</html>
